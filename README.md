@@ -1,17 +1,17 @@
 # 📊🏙️ Day12-Supervisor-Lite-DXB – Enterprise Dubai Deal Desk – FREE Stack
 
-![n8n](https://img.shields.io/badge/n8n-2.43.5-EA4B71?style=flat-square&logo=n8n)
-![Telegram](https://img.shields.io/badge/Telegram-Bot_API-26A5E4?style=flat-square&logo=telegram)
-![Supabase](https://img.shields.io/badge/Supabase-Postgres-3FCF8E?style=flat-square&logo=supabase)
-![Supervisor Lite](https://img.shields.io/badge/Supervisor_Lite-Day12--01-blue?style=flat-square)
-![Human Approval](https://img.shields.io/badge/Human_Approval-pending_→_approved-orange?style=flat-square)
-![Idempotency](https://img.shields.io/badge/Idempotency-UNIQUE_hour-yellow?style=flat-square)
-![Finance Approval](https://img.shields.io/badge/Finance_Approval-EXP--1201-green?style=flat-square)
-![Order Processing](https://img.shields.io/badge/Order_Processing-2_exceptions-purple?style=flat-square)
-![Error Handling](https://img.shields.io/badge/Error_Handling-Day12--00-red?style=flat-square)
-![FREE Stack](https://img.shields.io/badge/FREE_Stack-Telegram_replaces_Whapi-00BEBE?style=flat-square)
-![No Whapi](https://img.shields.io/badge/No_Whapi-Saved_$35%2Fmo-brightgreen?style=flat-square)
-![Multi-Agent Ready](https://img.shields.io/badge/Multi--Agent_Ready-Router_→_Agents-8A2BE2?style=flat-square)
+![n8n 2.43.5](https://img.shields.io/badge/n8n-v2.43.5-EA4B71?style=flat-square&logo=n8n&logoColor=white)
+![Telegram Bot API](https://img.shields.io/badge/Telegram-Bot_API-26A5E4?style=flat-square&logo=telegram&logoColor=white)
+![Supabase Postgres](https://img.shields.io/badge/Supabase-Postgres-3FCF8E?style=flat-square&logo=supabase&logoColor=white)
+![Supervisor Lite Day12-01](https://img.shields.io/badge/Supervisor_Lite-Day12--01-blue?style=flat-square&logo=checkmarx&logoColor=white)
+![Human Approval](https://img.shields.io/badge/Human_Approval-pending_to_approved-orange?style=flat-square&logo=person-check&logoColor=white)
+![Idempotency UNIQUE hour](https://img.shields.io/badge/Idempotency-UNIQUE_hour-yellow?style=flat-square&logo=shield-check&logoColor=black)
+![Finance Approval EXP-1201](https://img.shields.io/badge/Finance_Approval-EXP--1201-green?style=flat-square&logo=cash&logoColor=white)
+![Order Processing 2 exceptions](https://img.shields.io/badge/Order_Processing-2_exceptions-purple?style=flat-square&logo=package&logoColor=white)
+![Error Handling Day12-00](https://img.shields.io/badge/Error_Handling-Day12--00-red?style=flat-square&logo=alert-triangle&logoColor=white)
+![FREE Stack Telegram replaces Whapi](https://img.shields.io/badge/FREE_Stack-Telegram_replaces_Whapi-00BEBE?style=flat-square&logo=telegram&logoColor=white)
+![No Whapi Saved 35 USD mo](https://img.shields.io/badge/No_Whapi-Saved_35USD_per_mo-brightgreen?style=flat-square&logo=dollar-sign&logoColor=white)
+![Multi-Agent Ready](https://img.shields.io/badge/Multi--Agent_Ready-Router_to_Agents-8A2BE2?style=flat-square&logo=bot&logoColor=white)
 
 Prod-grade Dubai Deal Desk Day 12 — Supervisor Lite + Human Approval + Idempotency — Telegram Replaces $35/mo Whapi — n8n 2.43.5 + Supabase + Telegram
 
