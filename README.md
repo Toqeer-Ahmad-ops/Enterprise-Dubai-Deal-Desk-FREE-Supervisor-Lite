@@ -209,6 +209,10 @@ ORD-8821 payment_failed | ORD-8822 stock_short
 
 > **Key Patterns:** `Always Output Data ON` + `All Filters AND` + `Limit 1` + `UNIQUE hour` + `Response Immediately` prevents spam + workflow stop.
 
+## 📊 Evaluation
+
+See [Day 12-16 Evaluation Matrix](docs/Day12-16-Evaluation-Matrix.md) — Day 12 rows 1-8 filled (6 Pass, 2 Not Run), 9-40 planned for Day 13-16.
+
 ## 🔮 What's Next – Day 13 + Multi-Agent System
 
 ### Day 13 – WhatsApp Cloud API + Real Human Approval
