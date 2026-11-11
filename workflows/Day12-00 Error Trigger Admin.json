@@ -1,0 +1,211 @@
+{
+  "name": "Day12-00 Error Trigger Admin",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -80
+      ],
+      "id": "dcd9279d-5f77-445b-b57b-e7d19fd00059",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const e = $input.first().json;\nconst err = e.error || {};\nconst exec = e.execution || {};\nconst wf = e.workflow || {};\n\n// Only take short description, not full JSON\nlet msg = err.description || err.message || '';\nif (typeof msg !== 'string') msg = '';\n// If still empty, search for short phrase\nif (!msg) {\n  const full = JSON.stringify(e);\n  const m = full.match(/Could not find[^.\"]+/i) || full.match(/Failed[^.\"]+/i);\n  msg = m ? m[0] : 'Workflow failed at ' + (err.lastNodeExecuted || 'Check Duplicate');\n}\n\nconst dubai = new Date().toLocaleString('en-GB',{timeZone:'Asia/Dubai',hour12:false});\n\nreturn [{\n  json: {\n    workflow_name: wf.name || e.workflow_name || 'Day12-01 Telegram Supervisor Lite',\n    workflow_id: wf.id || e.workflow_id || '',\n    execution_id: exec.id || e.execution_id || '',\n    execution_url: exec.url || e.execution_url || '',\n    node_name: e.node?.name || e.node_name || err.lastNodeExecuted || 'Check Duplicate',\n    error_message: msg.slice(0,200),\n    severity: 'critical',\n    business_type: 'RE Leads',\n    dubai_time: dubai\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -80
+      ],
+      "id": "b07de49e-d0ff-4793-83d5-2dabec0eb089",
+      "name": "Set Error Context"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5fdfd037-1087-40b0-84dc-81155c8f1111",
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "6a3e4296-db1f-409f-a208-e26b3f53c149",
+      "name": "Is Critical?"
+    },
+    {
+      "parameters": {
+        "chatId": "6345263750",
+        "text": "=🚨 <b>CRITICAL FAILURE</b> - {{$json.workflow_name}}\n\n<b>Node:</b> <code>{{$json.node_name}}</code>\n<b>Time Dubai:</b> {{$json.dubai_time}}\n<b>Error:</b> <code>{{$json.error_message}}</code>\n\n<b>Exec:</b> {{$json.execution_url}}\n\n⚡ Reliability: UNIQUE(lead_id, alert_type, hour, channel) + Error Trigger Admin\n💰 FREE: Telegram @dubai_deal_desk_bot replaces $35 Whapi",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -192
+      ],
+      "id": "b16c88d9-92d7-42ec-9952-6168a8defada",
+      "name": "Telegram Admin Alert",
+      "webhookId": "f98fa3f4-9c40-4c1b-8b07-b7cf2f8d5626",
+      "credentials": {
+        "telegramApi": {
+          "id": "AcnnyXRYpoHq8gG0",
+          "name": "Telegram Dubai Deal Desk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "error_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "workflow_name",
+              "fieldValue": "={{ $('Set Error Context').first().json.workflow_name }}"
+            },
+            {
+              "fieldId": "node_name",
+              "fieldValue": "={{ $('Set Error Context').first().json.node_name }}"
+            },
+            {
+              "fieldId": "error_message",
+              "fieldValue": "={{ $('Set Error Context').first().json.error_message }}"
+            },
+            {
+              "fieldId": "error_stack",
+              "fieldValue": "={{ $('Set Error Context').first().json.execution_url }}"
+            },
+            {
+              "fieldId": "payload",
+              "fieldValue": "={{ {execution_id: $('Set Error Context').first().json.execution_id, execution_url: $('Set Error Context').first().json.execution_url, dubai_time: $('Set Error Context').first().json.dubai_time, node: $('Set Error Context').first().json.node_name} }}"
+            },
+            {
+              "fieldId": "level",
+              "fieldValue": "={{ $('Set Error Context').first().json.severity === 'warning' ? 'warn' : 'critical' }}"
+            },
+            {
+              "fieldId": "resolved",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -80
+      ],
+      "id": "9c02b6ef-8d58-46f2-80bd-21f28e342487",
+      "name": "Log to Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Error Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Error Context": {
+      "main": [
+        [
+          {
+            "node": "Is Critical?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Critical?": {
+      "main": [
+        [
+          {
+            "node": "Telegram Admin Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Admin Alert": {
+      "main": [
+        [
+          {
+            "node": "Log to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Supabase": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "30b7ca52-82e2-4f5c-a752-0e4e7c8a0a9e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8e66c5449e72620cf9a6b99d81b6bfc7b5a4be1edd8d4a0fe864152e0171afad"
+  },
+  "nodeGroups": [],
+  "id": "ecpFkO51thbEJUfi",
+  "tags": []
+}

@@ -1,0 +1,387 @@
+{
+  "name": "Day12-03_Order_Processing_SIMULATED",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -1088
+      ],
+      "id": "3e6787c3-a6a8-40a4-98fb-6c3f2dad6b03",
+      "name": "Manual Expense Trigger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5bb73908-0e19-4cb4-acbd-d51f83867aae",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        336,
+        -1184
+      ],
+      "id": "3e54bfbb-1107-40e7-a2c2-a9e617447df9",
+      "name": "Duplicate?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -1280
+      ],
+      "id": "1e4e3dbb-a246-4bea-8a15-cf1a61eafd13",
+      "name": "Set Skipped"
+    },
+    {
+      "parameters": {
+        "chatId": "6345263750",
+        "text": "={{ $('Formatter Order').first().json.telegram_text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        -1088
+      ],
+      "id": "02d99688-31ea-4d69-93e2-73f6e7a0ab16",
+      "name": "Telegram Dispatch",
+      "webhookId": "1fa8f7af-6d4d-4395-ac47-9cd065f524bb",
+      "credentials": {
+        "telegramApi": {
+          "id": "AcnnyXRYpoHq8gG0",
+          "name": "Telegram Dubai Deal Desk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "notification_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Get Order Items').first().json.id }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "={{ $('Formatter Order').first().json.alert_type }}"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "telegram"
+            },
+            {
+              "fieldId": "business_type",
+              "fieldValue": "={{ $('Formatter Order').first().json.business_type }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -1088
+      ],
+      "id": "c6cabb83-3b9b-4271-b168-aa5805364226",
+      "name": "Log Notification",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "approval_queue",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $json.items?.[0]?.lead_id || null }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "={{ $json.alert_type }}"
+            },
+            {
+              "fieldId": "business_type",
+              "fieldValue": "Order Processing"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "pending"
+            },
+            {
+              "fieldId": "requires_approval",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -1184
+      ],
+      "id": "52c58394-b754-4d45-bce4-6bfa13f19fb0",
+      "name": "Log Approval Queue",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "notification_log",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "alert_type",
+              "condition": "eq",
+              "keyValue": "={{ $json.alert_type }}"
+            },
+            {
+              "keyName": "channel",
+              "condition": "eq",
+              "keyValue": "telegram"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -1184
+      ],
+      "id": "49f6b1b5-4d40-4530-8553-aabc94d6d261",
+      "name": "Check Duplicate",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 5 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -784,
+        -1280
+      ],
+      "id": "f5c00563-4efe-4ede-91cc-b7a24f4209e5",
+      "name": "Cron 09:20 Dubai"
+    },
+    {
+      "parameters": {
+        "jsCode": "const a = $('Get Order Items').first().json;\nconst b = $('Get Order Items').last().json;\nlet items = [a];\nif (b && b.id !== a.id) items.push(b);\n\nlet total = 0;\nfor (let i=0;i<items.length;i++) total += Number(items[i].amount) || 0;\n\nfunction getDetail(e){\n  if (e.exception_type === 'payment_failed') return {action: 'Retry payment + Call customer', owner: 'Finance Ops', impact: 'Order blocked'};\n  if (e.exception_type === 'stock_short') return {action: 'Check warehouse + Reorder', owner: 'Warehouse', impact: 'Fulfillment delayed'};\n  return {action: 'Review + Escalate', owner: 'Ops Team', impact: 'Needs review'};\n}\n\nconst dashLink = \"https://supabase.com/dashboard/project/pnafbhfijmaaxsertzof\";\nconst now = new Date().toLocaleString('en-GB', {timeZone: 'Asia/Dubai', hour12:false});\nconst nums = [\"1️⃣\",\"2️⃣\",\"3️⃣\"];\n\nlet text = \"<b>📦 Order Processing - \" + items.length + \" exceptions | At Risk AED \" + total + \"</b>\\n\";\ntext += \"<b>━━━━━━━━━━━━━━━</b>\\n\";\nfor (let i=0;i<items.length;i++){\n  let e = items[i];\n  let d = getDetail(e);\n  let orderLink = \"<a href=\\\"\" + dashLink + \"\\\">\" + e.order_id + \"</a>\";\n  text += nums[i] + \" \" + orderLink + \" | \" + e.exception_type + \" | AED \" + e.amount + \"\\n\";\n  text += \"   Impact: \" + d.impact + \"\\n\";\n  text += \"   Action: \" + d.action + \" | Owner: \" + d.owner + \"\\n\";\n  text += \"   <a href=\\\"\" + dashLink + \"\\\">✅ Resolve</a> | <a href=\\\"\" + dashLink + \"\\\">❌ Escalate</a>\\n\";\n}\ntext += \"\\n⏰ SLA: Resolve in 2h | Turnaround 24h->2h\\n\";\ntext += \"⏰ \" + now + \"\\n\";\ntext += \"<a href=\\\"\" + dashLink + \"\\\">📊 View Dashboard</a> | <a href=\\\"https://rematch-extent-geology.ngrok-free.dev\\\">⚙️ View n8n</a>\\n\";\ntext += \"🆓 FREE Stack | Telegram API\";\n\nreturn [{json:{\n  telegram_text: text,\n  telegramText: text,\n  business_type: 'Order Processing',\n  entity_type: 'order',\n  alert_type: 'order_exception',\n  channel: 'telegram',\n  requires_approval: true,\n  items: items\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -1184
+      ],
+      "id": "9c074b3e-ed7f-4688-adbd-a5557c96204f",
+      "name": "Formatter Order"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "ecom_orders_sim",
+        "limit": 5,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "exception"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -1184
+      ],
+      "id": "d1453d45-849b-47ea-82bc-0b70d869eb11",
+      "name": "Get Order Items",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Expense Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Order Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Set Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Dispatch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Approval Queue": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cron 09:20 Dubai": {
+      "main": [
+        [
+          {
+            "node": "Get Order Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatter Order": {
+      "main": [
+        [
+          {
+            "node": "Log Approval Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Order Items": {
+      "main": [
+        [
+          {
+            "node": "Formatter Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Skipped": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2b4d01d2-ee66-4584-a368-dcadfa186566",
+  "meta": {
+    "instanceId": "8e66c5449e72620cf9a6b99d81b6bfc7b5a4be1edd8d4a0fe864152e0171afad"
+  },
+  "nodeGroups": [],
+  "id": "YNa9aTuOzlpYggZM",
+  "tags": []
+}

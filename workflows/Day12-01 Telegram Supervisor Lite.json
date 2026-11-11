@@ -1,0 +1,611 @@
+{
+  "name": "Day12-01 Telegram Supervisor Lite",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        224
+      ],
+      "id": "3c020fdb-06e3-49a8-a1a2-cade5e47a65a",
+      "name": "Manual Test"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "10 5 * * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        -160
+      ],
+      "id": "ce85044b-ffe9-4962-b373-7afc5b0281dd",
+      "name": "Cron Audit 09:10 Dubai"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pnafbhfijmaaxsertzof.supabase.co/rest/v1/rpc/get_daily_ops_metrics",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        96,
+        -160
+      ],
+      "id": "3f541a22-9ab2-46d6-b947-97e3ed9323a2",
+      "name": "RPC Daily Metrics",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pnafbhfijmaaxsertzof.supabase.co/rest/v1/rpc/get_top_action_leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        96,
+        32
+      ],
+      "id": "876fca4f-b0fd-4c6f-ad17-3e5d0dbcc8d4",
+      "name": "RPC Top Leads",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://pnafbhfijmaaxsertzof.supabase.co/rest/v1/rpc/get_sla_breached_leads",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        96,
+        224
+      ],
+      "id": "c4e6d2d9-c4fe-43bf-a160-de40852555fd",
+      "name": "RPC SLA Breach",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// FINAL - Eye-catching HTML - <b>Dubai Deal Desk - RE Leads Audit</b> + emojis - EN->EN AR->AR\nfunction getJsons(n){ try{ return $(n).all.map(i=>i.json).flat(); }catch(e){ return []; } }\nfunction isAr(t){ return /[\\u0600-\\u06FF]/.test(JSON.stringify(t)); }\n\nconst m = getJsons('RPC Daily Metrics')[0] || { active_count: 5, breach_count: 0 };\nconst top = getJsons('RPC Top Leads');\nconst sla = getJsons('RPC SLA Breach');\n\nconst active = m.active_count ?? 5;\nconst breach = m.breach_count ?? sla.length ?? 0;\nconst lang = isAr([...top, ...sla]) ? 'ar' : 'en';\nconst dubaiNow = new Date().toLocaleString('en-AE',{timeZone:'Asia/Dubai', hour12:false});\nconst dateOnly = dubaiNow.split(',')[0];\n\nlet txt = '';\n\nif(lang==='ar'){\n  txt += `<b>🏢 Dubai Deal Desk - RE Leads Audit</b>\\n`;\n  txt += `<b>━━━━━━━━━━━━━━━</b>\\n`;\n  txt += `📊 <b>نشط:</b>${active} | 🚨 <b>مخالفة:</b>${breach}\\n\\n`;\n  top.slice(0,5).forEach((l,i)=>{\n    txt += `${i+1}️⃣ <b>${l.name||'أحمد العقاري'}</b> | 🔥 ${l.score||95} | 📞 ${l.phone||''}\\n`;\n  });\n  txt += `\\n⏰ ${dubaiNow}\\n🆓 FREE Stack | No Twilio`;\n}else{\n  txt += `<b>🏢 Dubai Deal Desk - RE Leads Audit</b>\\n`;\n  txt += `<b>━━━━━━━━━━━━━━━</b>\\n`;\n  txt += `📊 <b>Active:</b>${active} | 🚨 <b>Breach:</b>${breach}\\n\\n`;\n  txt += `🔥 <b>Action: Call top 3 now</b>\\n`;\n  top.slice(0,5).forEach((l,i)=>{\n    const name = l.name || l.lead_name || `Lead ${String(l.lead_id||'').slice(0,8)}`;\n    const score = l.score || 95;\n    const band = score>=90?'🔥 HOT':score>=70?'⚡ Warm':'❄️ Cold';\n    txt += `${i+1}️⃣ <b>${name}</b> | ${band} ${score} | 📞 ${l.phone||'N/A'}\\n`;\n  });\n  txt += `\\n⏰ ${dateOnly}, ${dubaiNow.split(',')[1]||''} Dubai\\n`;\n  txt += `⚡ <i>Next: Follow-up in 1h</i>\\n`;\n  txt += `🆓 <b>FREE Stack | No Twilio | No Whapi $35</b>\\n`;\n}\n\nreturn [{json:{\n  telegram_text: txt,\n  telegramText: txt,\n  business_type: 'RE Leads',\n  alert_type: breach>0 ? 'sla_breach_1min' : 'hot_lead',\n  channel: 'telegram',\n  active_count: active,\n  breach_count: breach,\n  items: top,\n  approval_needed: false,\n  lang\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        32
+      ],
+      "id": "b29b80ad-511e-442e-8127-ff9858cb4404",
+      "name": "Formatter Generic"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {
+          "includeUnpaired": true
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        16
+      ],
+      "id": "0af802ee-b08a-4c60-baaa-4df1a5b1adfe",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9b0ba419-bd69-425e-9d98-47c8410bb83e",
+              "leftValue": "={{ $json.approval_needed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        32
+      ],
+      "id": "3a4e8dcd-931d-4d16-ad61-10d1c29c5e34",
+      "name": "IF Approval Needed?"
+    },
+    {
+      "parameters": {
+        "chatId": "6345263750",
+        "text": "={{ $('Formatter Generic').first().json.telegram_text }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        128
+      ],
+      "id": "282b5e60-d69a-4967-b299-ef884045d46e",
+      "name": "Telegram Dispatch",
+      "webhookId": "c740bbcd-73af-4e20-b2bc-8661f342bb18",
+      "credentials": {
+        "telegramApi": {
+          "id": "AcnnyXRYpoHq8gG0",
+          "name": "Telegram Dubai Deal Desk"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "728c36a4-14f3-4d1a-aba4-0bf4ee4849b3",
+              "leftValue": "={{ Object.keys($('Check Duplicate').first().json).length }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1216,
+        32
+      ],
+      "id": "90a270d0-8638-4d40-ad5e-c4d8fad6dfeb",
+      "name": "IF Duplicate?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fmt = $('Formatter Generic').first().json;\nreturn [{json:{lead_id:fmt.lead_id, alert_type:fmt.alert_type, channel:'telegram', business_type:'RE Leads', delivery_status:'skipped_duplicate', reason:'Idempotency blocked same hour'}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        -64
+      ],
+      "id": "14f6d574-159a-4ec7-a851-bfa466a25a48",
+      "name": "Set Skipped"
+    },
+    {
+      "parameters": {
+        "tableId": "notification_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Merge').first().json.lead_id || $('RPC Top Leads').first().json.lead_id || '00000000-0000-0000-0000-000000000000' }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "={{ $json.alert_type || 'sla_breach_1min' }}"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "telegram"
+            },
+            {
+              "fieldId": "business_type",
+              "fieldValue": "RE Leads"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        128
+      ],
+      "id": "ffb0bcb5-e56b-44a0-a9a6-4dbc82316a45",
+      "name": "Log Notification",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "sla_alert_log",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $json.lead_id || $('Merge').first().json.lead_id }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "sla_breach_1min"
+            },
+            {
+              "fieldId": "channel",
+              "fieldValue": "telegram"
+            },
+            {
+              "fieldId": "delivery_status",
+              "fieldValue": "={{ $json.delivery_status || 'sent' }} (when from Set Skipped = skipped_duplicate, when from Log Notification = sent)"
+            },
+            {
+              "fieldId": "business_type",
+              "fieldValue": "={{ $json.business_type || 'RE Leads' }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        32
+      ],
+      "id": "0c890cea-5cf5-4193-ab44-629aab421033",
+      "name": "Log SLA Alert",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "notification_log",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "channel",
+              "condition": "eq",
+              "keyValue": "telegram"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        992,
+        128
+      ],
+      "id": "b714438b-6234-4bf8-a8f1-3fb0e096acbb",
+      "name": "Check Duplicate",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "approval_queue",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Merge').first().json.lead_id }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "sla_breach_1min"
+            },
+            {
+              "fieldId": "business_type",
+              "fieldValue": "RE Leads"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        992,
+        -64
+      ],
+      "id": "0114fa6b-41aa-4d3b-81ec-982f922e4ef4",
+      "name": "Log Approval Queue",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uwAmK3QR0J2Wd1go",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron Audit 09:10 Dubai": {
+      "main": [
+        [
+          {
+            "node": "RPC Daily Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RPC Top Leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RPC SLA Breach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Test": {
+      "main": [
+        [
+          {
+            "node": "RPC Daily Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RPC Top Leads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RPC SLA Breach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RPC Daily Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RPC SLA Breach": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "RPC Top Leads": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Formatter Generic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Approval Needed?": {
+      "main": [
+        [
+          {
+            "node": "Log Approval Queue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatter Generic": {
+      "main": [
+        [
+          {
+            "node": "IF Approval Needed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Dispatch": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Set Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Dispatch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Skipped": {
+      "main": [
+        [
+          {
+            "node": "Log SLA Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Notification": {
+      "main": [
+        [
+          {
+            "node": "Log SLA Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate": {
+      "main": [
+        [
+          {
+            "node": "IF Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Approval Queue": {
+      "main": [
+        [
+          {
+            "node": "IF Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "ecpFkO51thbEJUfi",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "0c7262d5-625a-47f7-9b0b-7fbbbce55478",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8e66c5449e72620cf9a6b99d81b6bfc7b5a4be1edd8d4a0fe864152e0171afad"
+  },
+  "nodeGroups": [],
+  "id": "beAsRy6lKnl8egCk",
+  "tags": []
+}
