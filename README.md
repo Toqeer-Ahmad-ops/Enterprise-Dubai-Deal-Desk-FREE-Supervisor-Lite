@@ -33,7 +33,7 @@ Prod-grade Dubai Deal Desk Day 12 — Supervisor Lite + Human Approval + Idempot
 
 ## 🏗 Architecture – Day 12
 
-[Architecture Day 12 – Dark Version](screenshots/02-Architecture-Day12-Dark.jpg)
+![Architecture Day 12 – Dark Version](screenshots/02-Architecture-Day12-Dark.jpg)
 
 ```mermaid
 flowchart TD
@@ -179,19 +179,19 @@ ORD-8821 payment_failed | ORD-8822 stock_short
 ## 📸 Screenshots – Day 12
 
 ### 1. Architecture Day 12 – FREE Stack Supervisor Lite + Human Approval (Main)
-[Architecture Light](screenshots/01-Architecture-Day12-Light.jog)
+![Architecture Light](screenshots/01-Architecture-Day12-Light.jpg)
 
 ### 2. Workflow Day 12 – Full Workflow 1st Run Telegram + 2nd Run Skipped
-[Workflow Light](screenshots/03-Workflow-Day12-Light.jpg)
+![Workflow Light](screenshots/03-Workflow-Day12-Light.jpg)
 
 ### 3. Telegram Dispatch – 1st Run Green Tick – RE + Finance + Order + Error
-[Telegram Dispatch](screenshots/04-Telegram-Dispatch-Day12.png)
+![Telegram Dispatch](screenshots/04-Telegram-Dispatch-Day12.png)
 
 ### 4. Set Skipped – 2nd Run Same Hour – Idempotency Proof
-[Set Skipped](screenshots/05-Set-Skipped-Day12.png)
+![Set Skipped](screenshots/05-Set-Skipped-Day12.png)
 
 ### 5. Supabase Proof – Only Necessary Tables – Recruiter Notes
-[Supabase](screenshots/06-Supabase-Day12-Recruiter-Notes.png)
+![Supabase](screenshots/06-Supabase-Day12-Recruiter-Notes.png)
 
 
 ---
@@ -233,6 +233,7 @@ User / Cron / WhatsApp / Telegram
 
 ## 👨💻 Author
 **Toqeer Ahmad** – Dubai, UAE 🇦🇪
+
 AI Automation • Enterprise RAG • WhatsApp Bots • Lead Automation • n8n • Gemini 3.5 Flash Lite • Supabase pgvector • Qdrant • Arabic + Dubai dialect
 
 ---
