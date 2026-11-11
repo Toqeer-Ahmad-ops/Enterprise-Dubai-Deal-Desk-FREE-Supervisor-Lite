@@ -33,8 +33,7 @@ Prod-grade Dubai Deal Desk Day 12 — Supervisor Lite + Human Approval + Idempot
 
 ## 🏗 Architecture – Day 12
 
-[Architecture Day 12 – Light Version](screenshots/01-Architecture-Day12-Light.png)
-[Architecture Day 12 – Dark Version](screenshots/02-Architecture-Day12-Dark.png)
+[Architecture Day 12 – Dark Version](screenshots/02-Architecture-Day12-Dark.jpg)
 
 ```mermaid
 flowchart TD
@@ -180,10 +179,10 @@ ORD-8821 payment_failed | ORD-8822 stock_short
 ## 📸 Screenshots – Day 12
 
 ### 1. Architecture Day 12 – FREE Stack Supervisor Lite + Human Approval (Main)
-[Architecture Light](screenshots/01-Architecture-Day12-Light.png)
+[Architecture Light](screenshots/01-Architecture-Day12-Light.jog)
 
 ### 2. Workflow Day 12 – Full Workflow 1st Run Telegram + 2nd Run Skipped
-[Workflow Light](screenshots/03-Workflow-Day12-Light.png)
+[Workflow Light](screenshots/03-Workflow-Day12-Light.jpg)
 
 ### 3. Telegram Dispatch – 1st Run Green Tick – RE + Finance + Order + Error
 [Telegram Dispatch](screenshots/04-Telegram-Dispatch-Day12.png)
@@ -194,8 +193,6 @@ ORD-8821 payment_failed | ORD-8822 stock_short
 ### 5. Supabase Proof – Only Necessary Tables – Recruiter Notes
 [Supabase](screenshots/06-Supabase-Day12-Recruiter-Notes.png)
 
-### 6. GitHub README – For LinkedIn Post
-[README Screenshot](screenshots/07-GitHub-README-Day12.png)
 
 ---
 
